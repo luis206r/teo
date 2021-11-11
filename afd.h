@@ -61,17 +61,21 @@ string AFD::convert_re()
                 if (s == "")
                     s += "1";
                 else
-                    s += "+1";
+                    s ="("+s+"+1)";
             }
             if (s != "")
                 er[i][j] = s;
         }
     }
 
+    
+
     for (int i = 0; i < nfs; i++)
     { //conecto a los anteriores estados finales con el nuevo estado final
         er[fss[i] + 1][ns + 1] = "e";
     }
+
+   
 
     //=============================ELIMINACION DE ESTADOS=============================
 
@@ -86,42 +90,75 @@ string AFD::convert_re()
                 if (er[j][1] != "e")
                     s += er[j][1];
                 //verifico si tiene bucle
-                if (er[1][1] != "v")
+                if (er[1][1] != "v"){
                     if (er[1][1].length() == 1)
                         s += er[1][1] + "*";
                     else if (er[1][1].length() > 1) //para no repetir parentesis
                     {
-                        if ((er[1][1])[0] == '(' && (er[1][1])[er[1][1].length() - 1] == ')')
+                        /*if ((er[1][1])[0] == '(' && (er[1][1])[er[1][1].length() - 1] == ')')
                             s += er[1][1] + "*";
-                        else
+                        else*/
                             s += "(" + er[1][1] + ")*";
                     }
+                }
                 //hacia donde voy
                 for (int k = 2; k < er.size(); k++)
                 {
                     string m = "";
-                    if (er[1][k] != "v")
-                        m = s + er[1][k];
-                    if (er[j][k] == "v" || er[j][k] == "e")
-                        er[j][k] = m;
-                    else //para no repetir parentesis
-                    {
-                        if (er[j][k] != "" && i == ns - 1)
-                            er[j][k] = er[j][k] + "+" + m;
-                        else if (er[j][k] != "")
-                            er[j][k] = "(" + er[j][k] + "+" + m + ")";
-                        else
-                            er[j][k] = m;
+                    if (er[1][k] != "v"){
+                        if(er[1][k] =="e") m=s;
+                        else{
+                            /*if(er[1][k][0]=='('&&er[1][k][er[1][k].length()-1]==')')*/m = s + er[1][k];
+                            
+                            }
+                    
+                        if (er[j][k] == "v" /*|| er[j][k] == "e"*/)
+                        if(m=="") er[j][k] = "e";
+                            else er[j][k] = m;
+                        else //para no repetir parentesis
+                        {
+                            if (i == ns - 1)
+                                er[j][k] = er[j][k] + "+" + m;
+                            else /*if (er[j][k] != "")*/
+                                er[j][k] = "(" + er[j][k] + "+" + m + ")";
+                            /*else
+                                er[j][k] = m;*/
+                        }
                     }
                 }
             }
         }
+
+            //-----------------------
+        cout<<"\n\n";
+        for(int i=0; i<er.size(); i++){
+            cout<<endl;
+            for(int j=0; j<er.size(); j++){
+                cout<<er[i][j]<<" ";
+            }
+        }
+        cout<<"\n\n";
+        //-----------------------
+
         for (int l = 0; l < er.size(); l++) //elimino fila 1 y columna 1 de mi matriz
         {
             er[l].erase(er[l].begin() + 1);
         }
         er.erase(er.begin() + 1);
     }
+
+     //-----------------------
+    cout<<"\n\n";
+    for(int i=0; i<er.size(); i++){
+        cout<<endl;
+        for(int j=0; j<er.size(); j++){
+            cout<<er[i][j]<<" ";
+        }
+    }
+    cout<<"\n\n";
+    //-----------------------
+
+    
 
     string final = "";
     if (er[0][0] != "v")
