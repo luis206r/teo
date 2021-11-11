@@ -14,7 +14,6 @@ public:
     AFD(int n, int a, int b);
     void printft();
     string convert_re();
-    void del_st(int index);
 };
 
 AFD::AFD(int n, int a, int b)
@@ -42,6 +41,25 @@ void AFD::printft()
 
 string AFD::convert_re()
 {
+    if (fss.size() == 0)
+        return "v"; //si no hay estados finales retorno v (vacio)
+
+    else if (fss.size() == 1)
+    { //si hay un estadofinal y no esta conectado a los otros estados retorno v (vacio)
+        int v = 0;
+        for (int i = 0; i < fss.size(); i++)
+        {
+            for (int j = 0; j < ns; j++)
+            {
+                if (ft[j].first == fss[i] && j != fss[i])
+                    v += 1;
+                else if (ft[j].second == fss[i] && j != fss[i])
+                    v += 1;
+            }
+            if (v == 0)
+                return "v";
+        }
+    }
 
     //=================IMPLEMENTACION DE MATRIZ PARA ER Y NORMALIZACION====================
     vector<vector<string>> er;
@@ -61,21 +79,17 @@ string AFD::convert_re()
                 if (s == "")
                     s += "1";
                 else
-                    s ="("+s+"+1)";
+                    s = "(" + s + "+1)";
             }
             if (s != "")
                 er[i][j] = s;
         }
     }
 
-    
-
     for (int i = 0; i < nfs; i++)
     { //conecto a los anteriores estados finales con el nuevo estado final
         er[fss[i] + 1][ns + 1] = "e";
     }
-
-   
 
     //=============================ELIMINACION DE ESTADOS=============================
 
@@ -90,7 +104,8 @@ string AFD::convert_re()
                 if (er[j][1] != "e")
                     s += er[j][1];
                 //verifico si tiene bucle
-                if (er[1][1] != "v"){
+                if (er[1][1] != "v")
+                {
                     if (er[1][1].length() == 1)
                         s += er[1][1] + "*";
                     else if (er[1][1].length() > 1) //para no repetir parentesis
@@ -98,23 +113,27 @@ string AFD::convert_re()
                         /*if ((er[1][1])[0] == '(' && (er[1][1])[er[1][1].length() - 1] == ')')
                             s += er[1][1] + "*";
                         else*/
-                            s += "(" + er[1][1] + ")*";
+                        s += "(" + er[1][1] + ")*";
                     }
                 }
                 //hacia donde voy
                 for (int k = 2; k < er.size(); k++)
                 {
                     string m = "";
-                    if (er[1][k] != "v"){
-                        if(er[1][k] =="e") m=s;
-                        else{
-                            /*if(er[1][k][0]=='('&&er[1][k][er[1][k].length()-1]==')')*/m = s + er[1][k];
-                            
-                            }
-                    
+                    if (er[1][k] != "v")
+                    {
+                        if (er[1][k] == "e")
+                            m = s;
+                        else
+                        {
+                            /*if(er[1][k][0]=='('&&er[1][k][er[1][k].length()-1]==')')*/ m = s + er[1][k];
+                        }
+
                         if (er[j][k] == "v" /*|| er[j][k] == "e"*/)
-                        if(m=="") er[j][k] = "e";
-                            else er[j][k] = m;
+                            if (m == "")
+                                er[j][k] = "e";
+                            else
+                                er[j][k] = m;
                         else //para no repetir parentesis
                         {
                             if (i == ns - 1)
@@ -129,15 +148,17 @@ string AFD::convert_re()
             }
         }
 
-            //-----------------------
-        cout<<"\n\n";
-        for(int i=0; i<er.size(); i++){
-            cout<<endl;
-            for(int j=0; j<er.size(); j++){
-                cout<<er[i][j]<<" ";
+        //-----------------------
+        cout << "\n\n";
+        for (int i = 0; i < er.size(); i++)
+        {
+            cout << endl;
+            for (int j = 0; j < er.size(); j++)
+            {
+                cout << er[i][j] << " ";
             }
         }
-        cout<<"\n\n";
+        cout << "\n\n";
         //-----------------------
 
         for (int l = 0; l < er.size(); l++) //elimino fila 1 y columna 1 de mi matriz
@@ -147,18 +168,18 @@ string AFD::convert_re()
         er.erase(er.begin() + 1);
     }
 
-     //-----------------------
-    cout<<"\n\n";
-    for(int i=0; i<er.size(); i++){
-        cout<<endl;
-        for(int j=0; j<er.size(); j++){
-            cout<<er[i][j]<<" ";
+    //-----------------------
+    cout << "\n\n";
+    for (int i = 0; i < er.size(); i++)
+    {
+        cout << endl;
+        for (int j = 0; j < er.size(); j++)
+        {
+            cout << er[i][j] << " ";
         }
     }
-    cout<<"\n\n";
+    cout << "\n\n";
     //-----------------------
-
-    
 
     string final = "";
     if (er[0][0] != "v")
@@ -168,6 +189,15 @@ string AFD::convert_re()
     final += er[0][1];
     if (er[1][1] != "v")
         final += "(" + er[0][0] + ")*";
+
+    for (int i = 0; i < final.size(); i++)
+    {
+        if (final[i] == 'v')
+        {
+            final = "v";
+            break;
+        }
+    }
 
     return final;
 }
