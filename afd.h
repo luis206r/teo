@@ -46,7 +46,6 @@ string AFD::convert_re(){
       for(int j=0; j<ns+2;j++){
         cout<<er[i][j]<<" ";
       }
-      
     }
     er[0][is+1]="e";
 
@@ -92,13 +91,20 @@ string AFD::convert_re(){
                 if(er[j][1]!="e")s+=er[j][1];    //rev->push_back(i); //almaceno los estados que pueden ir al estado que eliminaré (si i = 0 = qs, si i = ns+1 = qf, si 1<=i<=ns q=i-1);
                 //verifico si tiene bucle
                 if(er[1][1]!="v")
-                   s+="("+er[1][1]+")*";
+                    if(er[1][1].length()==1) s+= er[1][1]+"*";
+                    else if(er[1][1].length()>1){
+                        if((er[1][1])[0] =='(' && (er[1][1])[er[1][1].length()-1] == ')')s+= er[1][1]+"*"; //para no repetir parentesis
+                        else s+="("+er[1][1]+")*";
+                    }
                 //hacia donde voy
                 for(int k=2; k<er.size(); k++){
                     string m="";
                     if (er[1][k]!="v") m = s + er[1][k];
-                    if(er[j][k]=="v") er[j][k]= m;
-                    else er[j][k] = "(" + er[j][k] + "+" + m + ")";
+                    if(er[j][k]=="v"|| er[j][k]=="e") er[j][k]= m;
+                    else {
+                         if(er[j][k]!="") er[j][k] = "(" + er[j][k] + "+" + m + ")";
+                         else er[j][k] =  m;
+                    }
                 }
             }
         }
@@ -119,7 +125,7 @@ string AFD::convert_re(){
             cout << er[i][j] <<" |  ";
         }
     }
-    
+    cout<<"\nholaaaaaaa\n";
 
 */
     //-------------------------
